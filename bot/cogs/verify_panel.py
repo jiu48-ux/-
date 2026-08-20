@@ -12,13 +12,16 @@ class VerifyView(discord.ui.View):
 
     @discord.ui.button(label="인증하고 입장하기", style=discord.ButtonStyle.success, custom_id="btn_verify_user_by_id")
     async def verify_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # ⚡ 3초 시간초과(Timeout) 방지: 먼저 '처리 중' 상태를 전달합니다. (ephemeral=True)
+        await interaction.response.defer(ephemeral=True)
+
         guild = interaction.guild
         member = interaction.user  # 버튼을 누른 유저
 
         # 1. 역할 ID로 정확한 역할 찾기
         role = guild.get_role(VERIFY_ROLE_ID)
         if not role:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 f"❌ 지정된 역할(ID: `{VERIFY_ROLE_ID}`)을 서버에서 찾을 수 없습니다. 역할 ID를 다시 확인해 주세요.", 
                 ephemeral=True
             )
@@ -26,11 +29,10 @@ class VerifyView(discord.ui.View):
 
         # 2. 이미 인증된 유저인지 체크
         if role in member.roles:
-            await interaction.response.send_message("⚠️ 이미 인증이 완료된 계정입니다!", ephemeral=True)
+            await interaction.followup.send("⚠️ 이미 인증이 완료된 계정입니다!", ephemeral=True)
             return
 
         # 3. 유저 본인의 디스코드 이름(display_name) 앞에 이모지 붙여서 닉네임 변경
-        # 예: '홍길동' -> '꒰ა🐚໒꒱ 홍길동'
         new_nickname = f"{EMOJI_PREFIX} {member.display_name}"
         
         # 디스코드 닉네임 최대 길이는 32자 제한이 있으므로 짤림 방지 처리
@@ -42,19 +44,19 @@ class VerifyView(discord.ui.View):
             await member.edit(nick=new_nickname)
             await member.add_roles(role)
             
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 f"✅ 인증이 완료되었습니다!\n닉네임이 **`{new_nickname}`**(으)로 변경되고 **{role.mention}** 역할이 지급되었습니다.", 
                 ephemeral=True
             )
         except discord.Forbidden:
             # 봇의 권한이 서버 소유자/관리자보다 낮아서 닉네임을 못 바꾸는 경우
             await member.add_roles(role)
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 f"✅ 인증 및 역할({role.mention}) 지급이 완료되었습니다.\n(⚠️ 봇 역할 순위 권한 문제로 닉네임 변경은 건너뛰었습니다.)", 
                 ephemeral=True
             )
         except Exception as e:
-            await interaction.response.send_message(f"❌ 인증 처리 중 오류가 발생했습니다: {e}", ephemeral=True)
+            await interaction.followup.send(f"❌ 인증 처리 중 오류가 발생했습니다: {e}", ephemeral=True)
 
 class VerifyPanelCog(commands.Cog):
     def __init__(self, bot):
