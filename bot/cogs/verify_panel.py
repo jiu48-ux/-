@@ -112,7 +112,7 @@ class VerifyPanelCog(commands.Cog):
         )
         
         # 패널 구성 완성도 업
-        embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/3143/3143460.png") # 스쿠버 다이빙 아이콘
+        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1539962407085146174/1539996312144191518/scuverdive-.gif?ex=6a8858d4&is=6a870754&hm=101debfb21555504af4355b9e829214325ac8a496ff78bf76777ff8a4def24f9&") # 스쿠버 다이빙 아이콘
         embed.set_footer(text="Oceanic Scuba System • 안전하고 즐거운 다이빙 생활", icon_url=self.bot.user.display_avatar.url)
 
         await channel.send(embed=embed, view=VerifyView())
