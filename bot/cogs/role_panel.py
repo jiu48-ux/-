@@ -43,9 +43,9 @@ class RolePanelCog(commands.Cog):
                     return
             
             embed = discord.Embed(
-                title="🎭 역할 선택 패널",
+                title="🫧 𝒟𝒾𝓋𝑒𝓇'𝓈  𝒫𝒶𝓈𝓈𝓅𝑜𝓇𝓉 🫧",
                 description=(
-                    "# 🤿 Welcome to Scuba Dive Emoji Shop!\n\n"
+                    "# 🤿 Welcome to 𝓢𝓬𝓾𝓿𝓮𝓻 𝓭𝓲𝓿𝓮 Emoji Shop!\n\n"
                     "바닷속 숨겨진 이모지와 스티커 소식을 누구보다 빠르게 받아보세요!\n"
                     "아래 메뉴를 눌러 원하는 알림 역할을 선택할 수 있습니다. 🫧\n\n"
                     "------------------------------------------------\n\n"
