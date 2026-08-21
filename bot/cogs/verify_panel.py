@@ -4,7 +4,7 @@ from discord.ext import commands
 # ⚙️ [기본 설정]
 VERIFY_CHANNEL_ID = 1539964159314362409  # 인증 패널이 올 채널 ID
 VERIFY_ROLE_ID = 1539966686386462852    # 지급할 역할 ID
-EMOJI_PREFIX = "꒰ა🐚໒꒱"                 # 닉네임 앞 이모지
+EMOJI_PREFIX = "꒰ʚ🐚ɞ꒱"                 # 닉네임 앞 이모지
 
 # 🎨 [디자인 설정 - 바다 콘셉트]
 EMBED_COLOR = discord.Color.from_rgb(0, 119, 182) # 에메랄드 딥 블루 (바다색)
@@ -100,7 +100,7 @@ class VerifyPanelCog(commands.Cog):
 
         # 🌊 바다 테마 디자인 임베드
         embed = discord.Embed(
-            title="🌊 Oceanic Scuba Server | 입장 인증",
+            title="🌊 Oceanic 𝓢𝓬𝓾𝓿𝓮𝓻𝓭𝓲𝓿𝓮 Server | 입장 인증",
             description=(
                 "푸른 바닷속에 오신 것을 환영합니다! 🥽\n"
                 "아래 버튼을 눌러 인증을 완료하시면 서버의 모든 채널이 열립니다.\n\n"
