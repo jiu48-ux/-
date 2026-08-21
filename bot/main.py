@@ -4,21 +4,34 @@ import os
 import asyncio
 from keep_alive import keep_alive
 
+# 봇 인텐트 설정
 bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 
 async def load_extensions():
-    # cogs 폴더 안의 모든 파이썬 파일을 딱 한 번씩만 로드합니다.
-    for filename in os.listdir('./cogs'):
-        if filename.endswith('.py'):
-            # __init__.py 같은 파일은 제외하고 순수 cog만 불러옵니다.
-            if not filename.startswith('__'):
+    # main.py가 위치한 폴더 기준으로 cogs 폴더 경로를 안전하게 지정합니다.
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    cogs_dir = os.path.join(current_dir, 'cogs')
+    
+    # cogs 폴더가 존재할 때만 로드 진행
+    if os.path.exists(cogs_dir):
+        for filename in os.listdir(cogs_dir):
+            if filename.endswith('.py') and not filename.startswith('__'):
                 await bot.load_extension(f'cogs.{filename[:-3]}')
 
 async def main():
     async with bot:
+        # 1. cogs 명령어 파일 로드
         await load_extensions()
+        
+        # 2. Render 웹 포트 유지를 위한 Flask 서버 실행
         keep_alive()
-        await bot.start(os.environ.get('DISCORD_TOKEN'))
+        
+        # 3. 디스코드 로그인 및 봇 시작
+        token = os.environ.get('DISCORD_TOKEN')
+        if not token:
+            print("❌ 에러: DISCORD_TOKEN 환경 변수를 찾을 수 없습니다!")
+            return
+        await bot.start(token)
 
 if __name__ == '__main__':
     asyncio.run(main())
