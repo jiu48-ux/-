@@ -10,11 +10,11 @@ class RoleSelectView(discord.ui.View):
 
     @discord.ui.button(label="🤿 제작 알림", style=discord.ButtonStyle.primary, custom_id="role_btn_notice")
     async def notice_role(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await self.toggle_role(interaction, 1540288313661857913)
+        await self.toggle_role(interaction, "𝓓𝓮𝓮𝓹 𝓢𝓮𝓪")
 
     @discord.ui.button(label="🐬 이벤트 알림", style=discord.ButtonStyle.success, custom_id="role_btn_event")
     async def event_role(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await self.toggle_role(interaction, 1540289160500215858)
+        await self.toggle_role(interaction, "𝒟𝑜𝓁𝓅𝒽𝒾𝓃 𝒫𝒶𝓇𝓉𝓎")
 
     async def toggle_role(self, interaction: discord.Interaction, role_name: str):
         role = discord.utils.get(interaction.guild.roles, name=role_name)
