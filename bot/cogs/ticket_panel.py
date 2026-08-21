@@ -28,7 +28,7 @@ class UnifiedTicketPanelView(discord.ui.View):
             description="**문의하실 내용**을 상세히 남겨주시면 관리자가 확인 후 답변해 드립니다."
         )
 
-    @discord.ui.button(label="🚨 유저/채널 신고하기", style=discord.ButtonStyle.danger, custom_id="btn_unified_report")
+    @discord.ui.button(label="🚨 유저/채널 신고하기 🚨", style=discord.ButtonStyle.danger, custom_id="btn_unified_report")
     async def create_report(self, interaction: discord.Interaction, button: discord.ui.Button):
         await create_ticket_channel(
             interaction, 
