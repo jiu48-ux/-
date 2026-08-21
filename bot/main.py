@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 import os
 import asyncio
-from keep_alive import keep_alive
 
 bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 
@@ -17,7 +16,6 @@ async def load_extensions():
 async def main():
     async with bot:
         await load_extensions()
-        keep_alive()
         await bot.start(os.environ.get('DISCORD_TOKEN'))
 
 if __name__ == '__main__':
