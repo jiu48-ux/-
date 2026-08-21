@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 # ⚙️ [기본 설정]
-VERIFY_CHANNEL_ID = 1539988135847403661  # 인증 패널이 올 채널 ID
+VERIFY_CHANNEL_ID = 1539964159314362409  # 인증 패널이 올 채널 ID
 VERIFY_ROLE_ID = 1539966686386462852    # 지급할 역할 ID
 EMOJI_PREFIX = "꒰ა🐚໒꒱"                 # 닉네임 앞 이모지
 
