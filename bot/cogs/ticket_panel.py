@@ -40,7 +40,8 @@ class UnifiedTicketPanelView(discord.ui.View):
 # ==========================================
 # 2. 비공개 채널 생성 로직
 # ==========================================
-async def create_ticket_channel(interaction: discord.Interaction, prefix: str, title: str, desc: str):
+# 📌 description으로 매개변수 이름을 일치시켰습니다!
+async def create_ticket_channel(interaction: discord.Interaction, prefix: str, title: str, description: str):
     guild = interaction.guild
     user = interaction.user
 
@@ -50,12 +51,22 @@ async def create_ticket_channel(interaction: discord.Interaction, prefix: str, t
     if existing_channel:
         await interaction.response.send_message(f"⚠️ 이미 진행 중인 {prefix} 채널이 있습니다: {existing_channel.mention}", ephemeral=True)
         return
-    
+
+    # 1. 기본 권한 설정 (일반 유저 비공개, 신청자 및 봇 허용)
     overwrites = {
         guild.default_role: discord.PermissionOverwrite(read_messages=False),
         user: discord.PermissionOverwrite(read_messages=True, send_messages=True),
         guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
     }
+
+    # 2. 문의/신고 볼 수 있는 관리자 역할 권한 추가
+    staff_role1 = guild.get_role(1539945377724104755)
+    if staff_role1:
+        overwrites[staff_role1] = discord.PermissionOverwrite(read_messages=True, send_messages=True)
+
+    staff_role2 = guild.get_role(1539946285715427379)
+    if staff_role2:
+        overwrites[staff_role2] = discord.PermissionOverwrite(read_messages=True, send_messages=True)
 
     category = discord.utils.get(guild.categories, name=CATEGORY_NAME)
     if not category:
@@ -72,7 +83,7 @@ async def create_ticket_channel(interaction: discord.Interaction, prefix: str, t
     color = discord.Color.blue() if prefix == "문의" else discord.Color.red()
     embed = discord.Embed(
         title=f"📋 {title} 채널",
-        description=f"안녕하세요 {user.mention}님!\n\n{desc}\n\n볼일이 끝나시면 아래 **`🔒 종료 및 채널 삭제`** 버튼을 누르세요.",
+        description=f"안녕하세요 {user.mention}님!\n\n{description}\n\n볼일이 끝나시면 아래 **`🔒 종료 및 채널 삭제`** 버튼을 누르세요.",
         color=color
     )
     await ticket_channel.send(content=f"{user.mention} 님", embed=embed, view=TicketCloseView(prefix=prefix, ticket_owner=user))
@@ -93,11 +104,10 @@ class TicketCloseView(discord.ui.View):
         channel = interaction.channel
         guild = interaction.guild
 
-        # 1. 대화 기록 수집 (오래된 순서대로 정렬)
         messages = []
         async for msg in channel.history(limit=100, oldest_first=True):
             if msg.author.bot and msg.embeds and "📋" in (msg.embeds[0].title or ""):
-                continue  # 맨 처음 안내 임베드는 기록에서 제외
+                continue
             
             time_str = msg.created_at.strftime("%Y-%m-%d %H:%M:%S")
             content = msg.content if msg.content else "(이미지/첨부파일 포함)"
@@ -105,16 +115,13 @@ class TicketCloseView(discord.ui.View):
 
         log_text = "\n".join(messages) if messages else "작성된 메시지가 없습니다."
 
-        # 2. 내용이 너무 길면 짤림 방지 처리 (디스코드 글자 수 제한)
         if len(log_text) > 3800:
             log_text = log_text[-3800:] + "\n...(이전 대화 내용 생략)..."
 
-        # 3. 로그 채널 분기 (문의/신고 구분)
         is_inquiry = "문의" in channel.name or self.prefix == "문의"
         log_channel_id = INQUIRY_LOG_CHANNEL_ID if is_inquiry else REPORT_LOG_CHANNEL_ID
         log_channel = guild.get_channel(log_channel_id)
 
-        # 4. 관리자 로그 채널로 전송
         if log_channel:
             owner_mention = self.ticket_owner.mention if self.ticket_owner else "알 수 없음"
             color = discord.Color.blue() if is_inquiry else discord.Color.red()
@@ -133,7 +140,7 @@ class TicketCloseView(discord.ui.View):
         await channel.delete()
 
 # ==========================================
-# 4. Cog 메인 및 자동 패널 생성
+# 4. Cog 메인 및 자동 패널 삭제/생성
 # ==========================================
 class TicketPanelCog(commands.Cog):
     def __init__(self, bot):
@@ -146,9 +153,13 @@ class TicketPanelCog(commands.Cog):
 
         channel = self.bot.get_channel(TICKET_PANEL_CHANNEL_ID)
         if channel:
+            # 기존 봇의 패널 메시지 깔끔하게 삭제 후 새로 생성
             async for message in channel.history(limit=10):
-                if message.author == self.bot.user and message.embeds:
-                    return
+                if message.author == self.bot.user:
+                    try:
+                        await message.delete()
+                    except:
+                        pass
 
             embed = discord.Embed(
                 title="🎫 고객지원 및 신고 센터",
