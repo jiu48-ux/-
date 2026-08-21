@@ -16,8 +16,8 @@ class RoleSelectView(discord.ui.View):
     async def event_role(self, interaction: discord.Interaction, button: discord.ui.Button):
         await self.toggle_role(interaction, int(1540289160500215858))
 
-    async def toggle_role(self, interaction: discord.Interaction, role_name: str):
-        role = discord.utils.get(interaction.guild.roles, name=role_name)
+    async def toggle_role(self, interaction: discord.Interaction, role_id: int):
+        role = interaction.guild.get_role(role_id)
         if not role:
             await interaction.response.send_message(f"❌ `{role_name}` 역할을 찾을 수 없습니다.", ephemeral=True)
             return
