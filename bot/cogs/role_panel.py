@@ -43,7 +43,7 @@ class RolePanelCog(commands.Cog):
                     return
             
             embed = discord.Embed(
-                title="🫧 𝒟𝒾𝓋𝑒𝓇'𝓈  𝒫𝒶𝓈𝓈𝓅𝑜𝓇𝓉 🫧",
+                title="🫧 𝒟𝒾𝓋𝑒𝓇'𝓈  𝒫𝒶𝓈𝓈𝓅𝑜𝓇𝓉",
                 description=(
                     "# 🤿 Welcome to 𝓢𝓬𝓾𝓿𝓮𝓻 𝓭𝓲𝓿𝓮 Emoji Shop!\n\n"
                     "바닷속 숨겨진 이모지와 스티커 소식을 누구보다 빠르게 받아보세요!\n"
