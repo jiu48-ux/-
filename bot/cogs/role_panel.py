@@ -12,7 +12,7 @@ class RoleSelectView(discord.ui.View):
     async def notice_role(self, interaction: discord.Interaction, button: discord.ui.Button):
         await self.toggle_role(interaction, int(1540288313661857913))
 
-    @discord.ui.button(label="🐬 이벤트 알림", style=discord.ButtonStyle.success, custom_id="role_btn_event")
+    @discord.ui.button(label="🐬 이벤트 알림", style=discord.ButtonStyle.primary, custom_id="role_btn_event")
     async def event_role(self, interaction: discord.Interaction, button: discord.ui.Button):
         await self.toggle_role(interaction, int(1540289160500215858))
 
