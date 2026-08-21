@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-# ⚙️ [설정] 역할 패널 채널 ID
+#⚙️ [설정] 역할 패널 채널 ID
 ROLE_CHANNEL_ID = 1539988135847403661  # #역할-선택 채널 ID (숫자)
 
 class RoleSelectView(discord.ui.View):
@@ -19,15 +19,15 @@ class RoleSelectView(discord.ui.View):
     async def toggle_role(self, interaction: discord.Interaction, role_id: int):
         role = interaction.guild.get_role(role_id)
         if not role:
-            await interaction.response.send_message(f"❌ `{role_name}` 역할을 찾을 수 없습니다.", ephemeral=True)
+            await interaction.response.send_message(f"❌ `{role_id}` 역할을 찾을 수 없습니다.", ephemeral=True)
             return
 
         if role in interaction.user.roles:
             await interaction.user.remove_roles(role)
-            await interaction.response.send_message(f"❌ **{role.name}** 역할을 해제했습니다.", ephemeral=True)
+            await interaction.response.send_message(f"❌ **{role.id}** 역할을 해제했습니다.", ephemeral=True)
         else:
             await interaction.user.add_roles(role)
-            await interaction.response.send_message(f"✅ **{role.name}** 역할을 부여받았습니다!", ephemeral=True)
+            await interaction.response.send_message(f"✅ **{role.id}** 역할을 부여받았습니다!", ephemeral=True)
 
 class RolePanelCog(commands.Cog):
     def __init__(self, bot):
