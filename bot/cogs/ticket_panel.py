@@ -19,13 +19,13 @@ class UnifiedTicketPanelView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="📩 1:1 문의하기", style=discord.ButtonStyle.primary, custom_id="btn_unified_inquiry")
+    @discord.ui.button(label="💙 문의하기 💙", style=discord.ButtonStyle.primary, custom_id="btn_unified_inquiry")
     async def create_inquiry(self, interaction: discord.Interaction, button: discord.ui.Button):
         await create_ticket_channel(
             interaction, 
             prefix="문의", 
             title="1:1 문의", 
-            desc="**문의하실 내용**을 상세히 남겨주시면 관리자가 확인 후 답변해 드립니다."
+            description="**문의하실 내용**을 상세히 남겨주시면 관리자가 확인 후 답변해 드립니다."
         )
 
     @discord.ui.button(label="🚨 유저/채널 신고하기", style=discord.ButtonStyle.danger, custom_id="btn_unified_report")
@@ -34,7 +34,7 @@ class UnifiedTicketPanelView(discord.ui.View):
             interaction, 
             prefix="신고", 
             title="신고 접수", 
-            desc="**신고 대상(유저/채널)과 사유, 증거 스크린샷**을 함께 남겨주시면 관리자가 확인 후 조치하겠습니다."
+            description="**신고 대상(유저/채널)과 사유, 증거 스크린샷**을 함께 남겨주시면 관리자가 확인 후 조치하겠습니다."
         )
 
 # ==========================================
@@ -50,12 +50,20 @@ async def create_ticket_channel(interaction: discord.Interaction, prefix: str, t
     if existing_channel:
         await interaction.response.send_message(f"⚠️ 이미 진행 중인 {prefix} 채널이 있습니다: {existing_channel.mention}", ephemeral=True)
         return
-
+    
     overwrites = {
         guild.default_role: discord.PermissionOverwrite(read_messages=False),
         user: discord.PermissionOverwrite(read_messages=True, send_messages=True),
         guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
     }
+
+    staff_role = guild.get_role(1539945377724104755)  # 👈 여기에 실제 역할 ID 입력!
+    if staff_role:
+        overwrites[staff_role] = discord.PermissionOverwrite(read_messages=True, send_messages=True)
+
+    staff_role2 = guild.get_role(1539946285715427379)
+    if staff_role2:
+        overwrites[staff_role2] = discord.PermissionOverwrite(read_messages=True, send_messages=True)
 
     category = discord.utils.get(guild.categories, name=CATEGORY_NAME)
     if not category:
