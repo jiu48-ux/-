@@ -77,7 +77,7 @@ class VerifyView(discord.ui.View):
             )
 
 
-class VerifyPanelCog(commands.Cog):
+class RolePanelCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -119,4 +119,4 @@ class VerifyPanelCog(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(VerifyPanelCog(bot))
+    await bot.add_cog(RolePanelCog(bot))
