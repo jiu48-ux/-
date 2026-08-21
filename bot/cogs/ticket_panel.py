@@ -57,14 +57,6 @@ async def create_ticket_channel(interaction: discord.Interaction, prefix: str, t
         guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
     }
 
-    staff_role = guild.get_role(1539945377724104755)  # 👈 여기에 실제 역할 ID 입력!
-    if staff_role:
-        overwrites[staff_role] = discord.PermissionOverwrite(read_messages=True, send_messages=True)
-
-    staff_role2 = guild.get_role(1539946285715427379)
-    if staff_role2:
-        overwrites[staff_role2] = discord.PermissionOverwrite(read_messages=True, send_messages=True)
-
     category = discord.utils.get(guild.categories, name=CATEGORY_NAME)
     if not category:
         category = await guild.create_category(CATEGORY_NAME)
