@@ -1,13 +1,11 @@
 import discord
 from discord.ext import commands
 
-# ⚙️ [설정]
 NOTICE_CHANNEL_ID = 1540640158628716644  # 공지 채널 ID
 
-# 📌 공지를 쓸 수 있는 허용 역할 ID 목록
 ALLOWED_ROLE_IDS = [
-    1539945377724104755,  # 예: 스태프 역할 ID
-    1539946285715427379   # 예: 공지 작성자 역할 ID
+    1539945377724104755,
+    1539946285715427379
 ]
 
 class AutoNoticeCog(commands.Cog):
@@ -20,25 +18,31 @@ class AutoNoticeCog(commands.Cog):
         if message.author.bot or message.channel.id != NOTICE_CHANNEL_ID:
             return
 
-        # 2. 작성 권한 확인 (서버 관리자 OR 허용된 역할 보유자)
+        # 2. 작성 권한 확인
         is_admin = message.author.guild_permissions.administrator
         has_allowed_role = any(role.id in ALLOWED_ROLE_IDS for role in message.author.roles)
 
-        # 둘 다 해당하지 않으면 무시
         if not (is_admin or has_allowed_role):
             return
 
-        # 📌 3. 작성자의 역할 색상(Color) 결정
-        # 기본 핑크색 (역할에 고유 색상이 설정되어 있지 않을 때 적용)
-        embed_color = discord.Color(0xF705D2)
+        # ⚡ 3. [핵심] 메시지를 받자마자 "무조건 최우선으로 원본 삭제"!
+        try:
+            await message.delete()
+        except discord.Forbidden:
+            print("❌ 오류: 봇에게 '메시지 관리' 권한이 없어서 원본 메시지를 못 지웁니다!")
+            print("👉 디스코드 채널 설정에서 봇에게 '메시지 관리' 권한을 켜주세요.")
+            return
+        except Exception as e:
+            print(f"❌ 삭제 실패: {e}")
 
-        # 작성자가 가진 역할 중 가장 높은 위치의 색상 가져오기
+        # 4. 작성자의 역할 색상 가져오기
+        embed_color = discord.Color(0xF705D2)
         for role in reversed(message.author.roles):
             if role.color != discord.Color.default():
                 embed_color = role.color
                 break
 
-        # 4. 멘션(@everyone, @here, @역할) 추출
+        # 5. 멘션 추출
         mentions = []
         if message.mention_everyone:
             if "@everyone" in message.content:
@@ -52,12 +56,10 @@ class AutoNoticeCog(commands.Cog):
 
         mention_text = " ".join(list(dict.fromkeys(mentions))) if mentions else None
 
-        # 5. 첨부파일(이미지) 확인
-        image_url = None
-        if message.attachments:
-            image_url = message.attachments[0].url
+        # 6. 첨부파일(이미지) 확인
+        image_url = message.attachments[0].url if message.attachments else None
 
-        # 6. 임베드 생성 (자동 추출된 역할 색상 적용)
+        # 7. 임베드 생성
         embed = discord.Embed(
             title="📢 공지사항",
             description=message.content,
@@ -72,23 +74,16 @@ class AutoNoticeCog(commands.Cog):
         if image_url:
             embed.set_image(url=image_url)
 
-        # 7. 원본 삭제 후 (임베드 ➡️ 아래 멘션) 전송
+        # 8. 공지 전송
         try:
-            await message.delete()
-            
             allowed = discord.AllowedMentions(everyone=True, roles=True, users=True)
-
-            # 1단계: 임베드 전송
             await message.channel.send(embed=embed)
 
-            # 2단계: 멘션이 있다면 임베드 바로 밑에 전송
             if mention_text:
                 await message.channel.send(content=mention_text, allowed_mentions=allowed)
 
-        except discord.Forbidden:
-            print("⚠️ 봇에게 메시지 관리/전송 권한이 없습니다.")
         except Exception as e:
-            print(f"⚠️ 공지 변환 실패: {e}")
+            print(f"❌ 공지 전송 실패: {e}")
 
 async def setup(bot):
     await bot.add_cog(AutoNoticeCog(bot))
