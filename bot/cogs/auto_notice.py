@@ -40,7 +40,7 @@ class AutoNoticeCog(commands.Cog):
         embed = discord.Embed(
             title="📢 공지사항",
             description=message.content,
-            color=discord.Color(0xF705D2)
+            color=discord.Color(0x8fddff)
         )
         
         if message.guild.icon:
