@@ -3,7 +3,7 @@ import re
 from discord.ext import commands
 
 # ⚙️ [설정] 일반 채팅을 임베드로 자동 변환할 채널 ID를 입력하세요!
-NOTICE_CHANNEL_ID = 1540031700086693938  # 👈 공지 채널 ID로 수정 필수!
+NOTICE_CHANNEL_ID = 1540640158628716644  # 👈 공지 채널 ID로 수정 필수!
 
 class AutoNoticeCog(commands.Cog):
     def __init__(self, bot):
