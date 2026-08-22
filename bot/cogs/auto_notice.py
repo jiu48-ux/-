@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-NOTICE_CHANNEL_ID = 1540640158628716644  # 공지 채널 ID
+NOTICE_CHANNEL_ID = 1540752618387935383  # 공지 채널 ID
 
 ALLOWED_ROLE_IDS = [
     1539945377724104755,
