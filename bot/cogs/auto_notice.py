@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-NOTICE_CHANNEL_ID = 1540752618387935383  # 공지 채널 ID
+NOTICE_CHANNEL_ID = 1540640158628716644  # 공지 채널 ID
 
 ALLOWED_ROLE_IDS = [
     1539945377724104755,
@@ -25,12 +25,11 @@ class AutoNoticeCog(commands.Cog):
         if not (is_admin or has_allowed_role):
             return
 
-        # ⚡ 3. [핵심] 메시지를 받자마자 "무조건 최우선으로 원본 삭제"!
+        # 3. 원본 메시지 최우선 삭제
         try:
             await message.delete()
         except discord.Forbidden:
-            print("❌ 오류: 봇에게 '메시지 관리' 권한이 없어서 원본 메시지를 못 지웁니다!")
-            print("👉 디스코드 채널 설정에서 봇에게 '메시지 관리' 권한을 켜주세요.")
+            print("❌ 오류: 봇에게 '메시지 관리' 권한이 없습니다!")
             return
         except Exception as e:
             print(f"❌ 삭제 실패: {e}")
@@ -42,7 +41,7 @@ class AutoNoticeCog(commands.Cog):
                 embed_color = role.color
                 break
 
-        # 5. 멘션 추출
+        # 5. 멘션(@everyone, @here, @역할) 추출
         mentions = []
         if message.mention_everyone:
             if "@everyone" in message.content:
@@ -56,13 +55,39 @@ class AutoNoticeCog(commands.Cog):
 
         mention_text = " ".join(list(dict.fromkeys(mentions))) if mentions else None
 
-        # 6. 첨부파일(이미지) 확인
-        image_url = message.attachments[0].url if message.attachments else None
+        # 6. 첨부파일(이미지 배너 및 일반 파일) 추출
+        image_url = None
+        other_files = []
 
-        # 7. 임베드 생성
+        if message.attachments:
+            for attachment in message.attachments:
+                if attachment.content_type and attachment.content_type.startswith("image/"):
+                    if not image_url:
+                        image_url = attachment.url
+                else:
+                    other_files.append(f"📁 [{attachment.filename}]({attachment.url})")
+
+        # 7. 임베드 본문 구성
+        description_parts = []
+
+        # 임베드 맨 위에도 대상 태그 표시
+        if mention_text:
+            description_parts.append(f"🔔 **공지 대상:** {mention_text}\n")
+
+        # 본문 내용
+        if message.content:
+            description_parts.append(message.content)
+
+        # 기타 첨부파일
+        if other_files:
+            description_parts.append("\n**📎 첨부파일:**\n" + "\n".join(other_files))
+
+        full_description = "\n".join(description_parts)
+
+        # 8. 임베드 생성
         embed = discord.Embed(
             title="📢 공지사항",
-            description=message.content,
+            description=full_description,
             color=embed_color
         )
         
@@ -74,11 +99,14 @@ class AutoNoticeCog(commands.Cog):
         if image_url:
             embed.set_image(url=image_url)
 
-        # 8. 공지 전송
+        # 9. 공지 전송 및 확실한 알림 핑 발송
         try:
             allowed = discord.AllowedMentions(everyone=True, roles=True, users=True)
+            
+            # ① 임베드 상자 전송
             await message.channel.send(embed=embed)
 
+            # ② 실제 디스코드 알림을 띄우기 위해 임베드 바로 밑에 멘션 유지
             if mention_text:
                 await message.channel.send(content=mention_text, allowed_mentions=allowed)
 
