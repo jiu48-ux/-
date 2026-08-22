@@ -4,11 +4,10 @@ from discord.ext import commands
 # ⚙️ [설정]
 NOTICE_CHANNEL_ID = 1540640158628716644  # 공지 채널 ID
 
-# 📌 공지를 쓸 수 있는 허용 역할 ID 목록 (여러 개 등록 가능!)
-# 디스코드 설정 ➡️ 역할 ➡️ 원하는 역할 우클릭 ➡️ '역할 ID 복사'해서 넣으세요.
+# 📌 공지를 쓸 수 있는 허용 역할 ID 목록
 ALLOWED_ROLE_IDS = [
     1539945377724104755,  # 예: 스태프 역할 ID
-    1539946285715427379   # 예: 공지 작성자 역할 ID (필요 없으면 1개만 남기세요)
+    1539946285715427379   # 예: 공지 작성자 역할 ID
 ]
 
 class AutoNoticeCog(commands.Cog):
@@ -25,11 +24,21 @@ class AutoNoticeCog(commands.Cog):
         is_admin = message.author.guild_permissions.administrator
         has_allowed_role = any(role.id in ALLOWED_ROLE_IDS for role in message.author.roles)
 
-        # 둘 다 해당하지 않으면 일반 채팅으로 취소(무시)
+        # 둘 다 해당하지 않으면 무시
         if not (is_admin or has_allowed_role):
             return
 
-        # 3. 멘션(@everyone, @here, @역할) 추출
+        # 📌 3. 작성자의 역할 색상(Color) 결정
+        # 기본 핑크색 (역할에 고유 색상이 설정되어 있지 않을 때 적용)
+        embed_color = discord.Color(0xF705D2)
+
+        # 작성자가 가진 역할 중 가장 높은 위치의 색상 가져오기
+        for role in reversed(message.author.roles):
+            if role.color != discord.Color.default():
+                embed_color = role.color
+                break
+
+        # 4. 멘션(@everyone, @here, @역할) 추출
         mentions = []
         if message.mention_everyone:
             if "@everyone" in message.content:
@@ -43,16 +52,16 @@ class AutoNoticeCog(commands.Cog):
 
         mention_text = " ".join(list(dict.fromkeys(mentions))) if mentions else None
 
-        # 4. 첨부파일(이미지) 확인
+        # 5. 첨부파일(이미지) 확인
         image_url = None
         if message.attachments:
             image_url = message.attachments[0].url
 
-        # 5. 임베드 생성
+        # 6. 임베드 생성 (자동 추출된 역할 색상 적용)
         embed = discord.Embed(
             title="📢 공지사항",
             description=message.content,
-            color=discord.Color(0xF705D2)
+            color=embed_color
         )
         
         if message.guild.icon:
@@ -63,7 +72,7 @@ class AutoNoticeCog(commands.Cog):
         if image_url:
             embed.set_image(url=image_url)
 
-        # 6. 원본 삭제 후 (임베드 ➡️ 아래 멘션) 전송
+        # 7. 원본 삭제 후 (임베드 ➡️ 아래 멘션) 전송
         try:
             await message.delete()
             
